@@ -12,23 +12,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart';
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import { MonthlyConsumptionChart } from '@/components/dashboard/MonthlyConsumptionChart';
 
 export default async function DashboardPage() {
   const stats = await getInventoryStats();
   const consumptionData = await getMonthlyConsumption();
-
-  const chartConfig = {
-    consumption: {
-      label: 'مصرف',
-      color: 'hsl(var(--primary))',
-    },
-  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -75,22 +63,7 @@ export default async function DashboardPage() {
             <CardDescription>مصرف متریال در ۶ ماه گذشته</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px] w-full">
-              <BarChart accessibilityLayer data={consumptionData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Bar dataKey="consumption" fill="var(--color-consumption)" radius={4} />
-              </BarChart>
-            </ChartContainer>
+            <MonthlyConsumptionChart data={consumptionData} />
           </CardContent>
         </Card>
       </div>
