@@ -19,27 +19,30 @@ const getMaterialsFromStorage = (): Material[] => {
         materialCode: '100037151',
         description: 'FO D/C SM SC/SC 1CORE 2GUIDE OD 100M',
         status: getStatusFromCode('100037151'),
-        designation: 'FOC-001',
-        technicalIdentifier: 'TID-001',
-        version: 'v1'
+        partNumber: 'PN-001',
+        oldMaterialNumberMCI: 'OLD-MCI-001',
+        newMaterialNumberMCI: 'NEW-MCI-001',
+        otherOldMaterialNumber: 'OTHER-001'
       },
       {
         id: '2',
         materialCode: 'M100037152',
         description: 'TOWER SECTION 20M',
         status: getStatusFromCode('M100037152'),
-        designation: 'TWR-S20',
-        technicalIdentifier: 'TID-002',
-        version: 'v2'
+        partNumber: 'PN-002',
+        oldMaterialNumberMCI: 'OLD-MCI-002',
+        newMaterialNumberMCI: 'NEW-MCI-002',
+        otherOldMaterialNumber: 'OTHER-002'
       },
       {
         id: '3',
         materialCode: 'N100037153',
         description: 'TURNBUCKLE 16MM - DEFECTIVE',
         status: getStatusFromCode('N100037153'),
-        designation: 'TB-16-D',
-        technicalIdentifier: 'TID-003',
-        version: 'v1-def'
+        partNumber: 'PN-003',
+        oldMaterialNumberMCI: 'OLD-MCI-003',
+        newMaterialNumberMCI: 'NEW-MCI-003',
+        otherOldMaterialNumber: 'OTHER-003-DEF'
       },
   ];
 

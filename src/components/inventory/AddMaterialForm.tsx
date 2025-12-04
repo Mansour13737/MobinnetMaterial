@@ -21,14 +21,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import type { Material } from '@/lib/types';
 
 const formSchema = z.object({
   materialCode: z.string().min(1, 'کد متریال الزامی است.'),
   description: z.string().min(1, 'شرح متریال الزامی است.'),
-  designation: z.string().optional(),
-  technicalIdentifier: z.string().optional(),
-  version: z.string().optional(),
+  partNumber: z.string().optional(),
+  oldMaterialNumberMCI: z.string().optional(),
+  newMaterialNumberMCI: z.string().optional(),
+  otherOldMaterialNumber: z.string().optional(),
 });
 
 type AddMaterialFormValues = z.infer<typeof formSchema>;
@@ -51,9 +51,10 @@ export function AddMaterialForm({
     defaultValues: {
       materialCode: '',
       description: '',
-      designation: '',
-      technicalIdentifier: '',
-      version: '',
+      partNumber: '',
+      oldMaterialNumberMCI: '',
+      newMaterialNumberMCI: '',
+      otherOldMaterialNumber: '',
     },
   });
 
@@ -83,9 +84,9 @@ export function AddMaterialForm({
               name="materialCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>کد متریال</FormLabel>
+                  <FormLabel>Material</FormLabel>
                   <FormControl>
-                    <Input placeholder="مثلا M10001234" {...field} />
+                    <Input placeholder="مثلا 10001234" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -96,7 +97,7 @@ export function AddMaterialForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>شرح متریال</FormLabel>
+                  <FormLabel>Material description</FormLabel>
                   <FormControl>
                     <Input placeholder="مثلا TOWER SECTION 20M" {...field} />
                   </FormControl>
@@ -106,10 +107,10 @@ export function AddMaterialForm({
             />
             <FormField
               control={form.control}
-              name="designation"
+              name="partNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Designation</FormLabel>
+                  <FormLabel>Part Number</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -119,10 +120,10 @@ export function AddMaterialForm({
             />
             <FormField
               control={form.control}
-              name="technicalIdentifier"
+              name="oldMaterialNumberMCI"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Technical Identifier</FormLabel>
+                  <FormLabel>Old Material Number MCI</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -132,10 +133,23 @@ export function AddMaterialForm({
             />
              <FormField
               control={form.control}
-              name="version"
+              name="newMaterialNumberMCI"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Version</FormLabel>
+                  <FormLabel>New Material Number MCI</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="otherOldMaterialNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Other Old Material Number</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

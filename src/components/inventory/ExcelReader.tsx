@@ -33,18 +33,19 @@ export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, re
         const worksheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         
-        // Assuming headers are: 'Material Code', 'Description', 'Designation', 'Technical Identifier', 'Version'
-        // And data starts from the second row
+        // Assuming headers are in the first row
+        // No.,Material,Material description,Part Number,Old Material Number MCI,New Material Number MCI,Other Old Material Number
         const materials: Material[] = json.slice(1).map((row: any, index: number) => {
-          const materialCode = String(row[0] || '');
+          const materialCode = String(row[1] || '');
           return {
             id: `imported-${Date.now()}-${index}`,
             materialCode,
-            description: String(row[1] || ''),
+            description: String(row[2] || ''),
             status: getStatusFromCode(materialCode),
-            designation: String(row[2] || ''),
-            technicalIdentifier: String(row[3] || ''),
-            version: String(row[4] || ''),
+            partNumber: String(row[3] || ''),
+            oldMaterialNumberMCI: String(row[4] || ''),
+            newMaterialNumberMCI: String(row[5] || ''),
+            otherOldMaterialNumber: String(row[6] || ''),
           };
         }).filter(m => m.materialCode && m.description); // Filter out empty rows
 

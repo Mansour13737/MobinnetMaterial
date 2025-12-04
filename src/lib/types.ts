@@ -3,7 +3,8 @@ export type Material = {
   materialCode: string;
   description: string;
   status: 'سالم' | 'معیوب';
-  designation?: string;
-  technicalIdentifier?: string;
-  version?: string;
+  partNumber?: string;
+  oldMaterialNumberMCI?: string;
+  newMaterialNumberMCI?: string;
+  otherOldMaterialNumber?: string;
 };
