@@ -8,7 +8,7 @@ import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { intelligentMaterialSearch } from '@/ai/flows/intelligent-material-search';
-import { addMaterials, getStatusFromCode, getMaterials } from '@/lib/data';
+import { addMaterials, getStatusFromCode, getMaterials, deleteMaterial } from '@/lib/data';
 import { Skeleton } from '../ui/skeleton';
 import { ExcelReader } from './ExcelReader';
 import { AddMaterialForm } from './AddMaterialForm';
@@ -51,8 +51,10 @@ export function InventoryPage({
       try {
         const result = await intelligentMaterialSearch({ searchTerm });
         const allMaterials = await getMaterials();
+        // The AI returns a list of matching description strings.
+        // We filter the full material list to find the corresponding material objects.
         const foundMaterials = allMaterials.filter(m => 
-          result.results.some(res => m.description.toLowerCase().includes(res.toLowerCase()))
+          result.results.some(res => m.description.toLowerCase() === res.toLowerCase())
         );
         setSearchResults(foundMaterials);
       } catch (error) {

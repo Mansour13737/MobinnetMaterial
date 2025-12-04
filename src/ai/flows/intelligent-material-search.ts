@@ -23,7 +23,7 @@ export type IntelligentMaterialSearchInput = z.infer<
 const IntelligentMaterialSearchOutputSchema = z.object({
   results: z
     .array(z.string())
-    .describe('A list of material descriptions that match the search term.'),
+    .describe('A list of material descriptions that semantically match the search term.'),
 });
 export type IntelligentMaterialSearchOutput = z.infer<
   typeof IntelligentMaterialSearchOutputSchema
@@ -39,13 +39,13 @@ const intelligentMaterialSearchPrompt = ai.definePrompt({
   name: 'intelligentMaterialSearchPrompt',
   input: {schema: IntelligentMaterialSearchInputSchema},
   output: {schema: IntelligentMaterialSearchOutputSchema},
-  prompt: `You are an AI assistant specialized in searching for materials in a list based on user queries.
+  prompt: `You are an AI assistant that excels at semantic search. Your task is to find the most relevant material descriptions from a provided list based on a user's search query.
 
-  The user will provide a search term, and you should return a list of keywords or phrases from the material description that closely match the search term. Consider potential typos, vague descriptions, and similar items.
+Consider synonyms, related concepts, and user intent, not just keyword matching.
 
-  Search Term: {{{searchTerm}}}
+Search Term: {{{searchTerm}}}
 
-  Return the keywords found in the material descriptions.
+Return a list of the full, original material descriptions that are the most relevant matches.
   `,
 });
 
