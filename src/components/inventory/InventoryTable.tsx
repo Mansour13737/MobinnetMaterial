@@ -73,9 +73,6 @@ export function InventoryTable({
               <TableHead>Material</TableHead>
               <TableHead>Material description</TableHead>
               <TableHead>Part Number</TableHead>
-              <TableHead>Old Material Number MCI</TableHead>
-              <TableHead>New Material Number MCI</TableHead>
-              <TableHead>Other Old Material Number</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
               <TableHead className="text-left">عملیات</TableHead>
             </TableRow>
@@ -88,9 +85,6 @@ export function InventoryTable({
                   <TableCell className="font-medium font-code">{item.materialCode}</TableCell>
                   <TableCell>{item.description}</TableCell>
                   <TableCell>{item.partNumber}</TableCell>
-                  <TableCell>{item.oldMaterialNumberMCI}</TableCell>
-                  <TableCell>{item.newMaterialNumberMCI}</TableCell>
-                  <TableCell>{item.otherOldMaterialNumber}</TableCell>
                   <TableCell className="text-center">
                     <Badge
                       variant={
@@ -112,7 +106,7 @@ export function InventoryTable({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی ثبت نشده است.'}
                 </TableCell>
               </TableRow>

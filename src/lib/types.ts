@@ -4,7 +4,4 @@ export type Material = {
   description: string;
   status: 'سالم' | 'معیوب';
   partNumber?: string;
-  oldMaterialNumberMCI?: string;
-  newMaterialNumberMCI?: string;
-  otherOldMaterialNumber?: string;
 };

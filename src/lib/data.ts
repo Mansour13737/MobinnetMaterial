@@ -20,9 +20,6 @@ const getMaterialsFromStorage = (): Material[] => {
         description: 'FO D/C SM SC/SC 1CORE 2GUIDE OD 100M',
         status: getStatusFromCode('100037151'),
         partNumber: 'PN-001',
-        oldMaterialNumberMCI: 'OLD-MCI-001',
-        newMaterialNumberMCI: 'NEW-MCI-001',
-        otherOldMaterialNumber: 'OTHER-001'
       },
       {
         id: '2',
@@ -30,9 +27,6 @@ const getMaterialsFromStorage = (): Material[] => {
         description: 'TOWER SECTION 20M',
         status: getStatusFromCode('M100037152'),
         partNumber: 'PN-002',
-        oldMaterialNumberMCI: 'OLD-MCI-002',
-        newMaterialNumberMCI: 'NEW-MCI-002',
-        otherOldMaterialNumber: 'OTHER-002'
       },
       {
         id: '3',
@@ -40,9 +34,6 @@ const getMaterialsFromStorage = (): Material[] => {
         description: 'TURNBUCKLE 16MM - DEFECTIVE',
         status: getStatusFromCode('N100037153'),
         partNumber: 'PN-003',
-        oldMaterialNumberMCI: 'OLD-MCI-003',
-        newMaterialNumberMCI: 'NEW-MCI-003',
-        otherOldMaterialNumber: 'OTHER-003-DEF'
       },
   ];
 
@@ -51,7 +42,12 @@ const getMaterialsFromStorage = (): Material[] => {
      return initialMaterials;
   }
   try {
-    return JSON.parse(storedMaterials);
+    const parsed = JSON.parse(storedMaterials);
+    // Basic validation to ensure it's an array
+    if(Array.isArray(parsed)) {
+      return parsed;
+    }
+    return initialMaterials;
   } catch (e) {
     return initialMaterials;
   }
@@ -62,20 +58,25 @@ const getMaterialsFromStorage = (): Material[] => {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const getMaterials = async (): Promise<Material[]> => {
-  await delay(100); // Simulate short delay for storage access
+  await delay(50); // Simulate short delay for storage access
   return getMaterialsFromStorage();
 };
 
-export const addMaterials = async (newMaterials: Material[]): Promise<Material[]> => {
-  await delay(200);
+export const addMaterials = async (newMaterials: Omit<Material, 'id' | 'status'>[]): Promise<Material[]> => {
+  await delay(100);
   const currentMaterials = getMaterialsFromStorage();
-  const updatedMaterials = [...newMaterials, ...currentMaterials];
+  const materialsToAdd: Material[] = newMaterials.map((m, i) => ({
+    ...m,
+    id: `material-${Date.now()}-${i}`,
+    status: getStatusFromCode(m.materialCode),
+  }));
+  const updatedMaterials = [...materialsToAdd, ...currentMaterials];
   localStorage.setItem('materials', JSON.stringify(updatedMaterials));
   return updatedMaterials;
 }
 
 export const deleteMaterial = async (id: string): Promise<boolean> => {
-    await delay(400);
+    await delay(100);
     let materials = getMaterialsFromStorage();
     const initialLength = materials.length;
     materials = materials.filter(m => m.id !== id);

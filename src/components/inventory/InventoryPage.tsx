@@ -8,7 +8,7 @@ import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { intelligentMaterialSearch } from '@/ai/flows/intelligent-material-search';
-import { addMaterials, getStatusFromCode } from '@/lib/data';
+import { addMaterials, getStatusFromCode, getMaterials } from '@/lib/data';
 import { Skeleton } from '../ui/skeleton';
 import { ExcelReader } from './ExcelReader';
 import { AddMaterialForm } from './AddMaterialForm';
@@ -24,16 +24,20 @@ export function InventoryPage({
   const [searchResults, setSearchResults] = useState<Material[] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, startSearchTransition] = useTransition();
-  const [isImporting, startImportTransition] = useTransition();
+  const [isSubmitting, startSubmittingTransition] = useTransition();
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const fileInputRef = useRef<any>(null);
 
   useEffect(() => {
-    setMaterials(initialMaterials);
-  }, [initialMaterials]);
-
+    // On component mount, load materials from localStorage
+    const loadMaterials = async () => {
+      const storedMaterials = await getMaterials();
+      setMaterials(storedMaterials);
+    };
+    loadMaterials();
+  }, []);
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,7 +50,8 @@ export function InventoryPage({
     startSearchTransition(async () => {
       try {
         const result = await intelligentMaterialSearch({ searchTerm });
-        const foundMaterials = materials.filter(m => 
+        const allMaterials = await getMaterials();
+        const foundMaterials = allMaterials.filter(m => 
           result.results.some(res => m.description.toLowerCase().includes(res.toLowerCase()))
         );
         setSearchResults(foundMaterials);
@@ -65,11 +70,18 @@ export function InventoryPage({
     fileInputRef.current?.click();
   };
 
-  const handleFileProcessed = (newMaterials: Material[]) => {
-    startImportTransition(async () => {
+  const handleFileProcessed = (newMaterialsData: Omit<Material, 'id' | 'status'>[]) => {
+    startSubmittingTransition(async () => {
       try {
+        const newMaterials: Material[] = newMaterialsData.map((item, index) => ({
+          ...item,
+          id: `imported-${Date.now()}-${index}`,
+          status: getStatusFromCode(item.materialCode),
+        }));
+
         await addMaterials(newMaterials);
-        setMaterials(prev => [...newMaterials, ...prev]);
+        const allMaterials = await getMaterials();
+        setMaterials(allMaterials);
         toast({
           title: 'ایمپورت موفق',
           description: `${newMaterials.length} آیتم جدید با موفقیت از فایل اکسل ایمپورت شد.`,
@@ -85,7 +97,7 @@ export function InventoryPage({
   }
 
   const handleAddMaterial = (newMaterialData: Omit<Material, 'id' | 'status'>) => {
-     startImportTransition(async () => {
+     startSubmittingTransition(async () => {
        try {
         const newMaterial: Material = {
           ...newMaterialData,
@@ -93,7 +105,8 @@ export function InventoryPage({
           status: getStatusFromCode(newMaterialData.materialCode),
         };
         await addMaterials([newMaterial]);
-        setMaterials(prev => [newMaterial, ...prev]);
+        const allMaterials = await getMaterials();
+        setMaterials(allMaterials);
         toast({
           title: 'افزودن موفق',
           description: `متریال "${newMaterial.description}" با موفقیت اضافه شد.`,
@@ -116,8 +129,10 @@ export function InventoryPage({
     });
   }
 
-  const handleDelete = (id: string) => {
-    setMaterials(prev => prev.filter(m => m.id !== id));
+  const handleDelete = async (id: string) => {
+    await deleteMaterial(id);
+    const updatedMaterials = await getMaterials();
+    setMaterials(updatedMaterials);
     if (searchResults) {
       setSearchResults(prev => prev!.filter(m => m.id !== id));
     }
@@ -146,15 +161,15 @@ export function InventoryPage({
               <Download className="ml-2 h-4 w-4" />
               خروجی Excel
             </Button>
-            <Button onClick={handleImportClick} disabled={isImporting}>
-              {isImporting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
+            <Button onClick={handleImportClick} disabled={isSubmitting}>
+              {isSubmitting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
             </Button>
             <ExcelReader ref={fileInputRef} onFileProcessed={handleFileProcessed} />
             <AddMaterialForm 
               isOpen={isAddModalOpen} 
               onOpenChange={setAddModalOpen} 
               onAddMaterial={handleAddMaterial}
-              isSubmitting={isImporting}
+              isSubmitting={isSubmitting}
             />
           </div>
         }

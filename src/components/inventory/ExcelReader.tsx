@@ -7,7 +7,7 @@ import { getStatusFromCode } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExcelReaderProps {
-  onFileProcessed: (data: Material[]) => void;
+  onFileProcessed: (data: Omit<Material, 'id' | 'status'>[]) => void;
 }
 
 export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, ref) => {
@@ -34,18 +34,12 @@ export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, re
         const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         
         // Assuming headers are in the first row
-        // No.,Material,Material description,Part Number,Old Material Number MCI,New Material Number MCI,Other Old Material Number
-        const materials: Material[] = json.slice(1).map((row: any, index: number) => {
-          const materialCode = String(row[1] || '');
+        // No.,Material,Material description,Part Number
+        const materials: Omit<Material, 'id' | 'status'>[] = json.slice(1).map((row: any) => {
           return {
-            id: `imported-${Date.now()}-${index}`,
-            materialCode,
+            materialCode: String(row[1] || ''),
             description: String(row[2] || ''),
-            status: getStatusFromCode(materialCode),
-            partNumber: String(row[3] || ''),
-            oldMaterialNumberMCI: String(row[4] || ''),
-            newMaterialNumberMCI: String(row[5] || ''),
-            otherOldMaterialNumber: String(row[6] || ''),
+            partNumber: String(row[4] || ''), // Corresponds to Part Number column
           };
         }).filter(m => m.materialCode && m.description); // Filter out empty rows
 
