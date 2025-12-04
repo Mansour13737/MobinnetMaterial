@@ -44,9 +44,9 @@ export function AppSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <Link href={item.href} legacyBehavior passHref>
+              <Link href={item.href} passHref>
                 <SidebarMenuButton
-                  asChild
+                  as="a"
                   isActive={pathname.startsWith(item.href)}
                   tooltip={item.label}
                   className={cn(
@@ -54,12 +54,10 @@ export function AppSidebar() {
                     'group-data-[collapsible=icon]:justify-center'
                   )}
                 >
-                  <a>
                     <item.icon className="h-5 w-5" />
                     <span className="group-data-[collapsible=icon]:hidden">
                       {item.label}
                     </span>
-                  </a>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
