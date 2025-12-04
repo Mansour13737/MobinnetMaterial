@@ -30,13 +30,15 @@ export function InventoryTable({
   hasSearchResults,
   currentPage,
   totalPages,
-  onPageChange
+  onPageChange,
+  onDelete
 }: {
   materials: Material[],
   hasSearchResults: boolean,
   currentPage: number,
   totalPages: number,
-  onPageChange: (page: number) => void
+  onPageChange: (page: number) => void,
+  onDelete: (id: string) => void
 }) {
   const { toast } = useToast();
 
@@ -46,7 +48,7 @@ export function InventoryTable({
     const result = await deleteMaterial(id);
     if(result) {
         toast({ title: 'موفقیت', description: 'آیتم با موفقیت حذف شد.' });
-        window.location.reload();
+        onDelete(id);
     } else {
         toast({ variant: 'destructive', title: 'خطا', description: 'حذف آیتم با مشکل مواجه شد.' });
     }
@@ -69,6 +71,9 @@ export function InventoryTable({
             <TableRow>
               <TableHead>کد متریال</TableHead>
               <TableHead>شرح متریال</TableHead>
+              <TableHead>Designation</TableHead>
+              <TableHead>Technical Identifier</TableHead>
+              <TableHead>Version</TableHead>
               <TableHead>واحد</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
               <TableHead className="text-left">عملیات</TableHead>
@@ -80,6 +85,9 @@ export function InventoryTable({
                 <TableRow key={item.id}>
                   <TableCell className="font-medium font-code">{item.materialCode}</TableCell>
                   <TableCell>{item.description}</TableCell>
+                  <TableCell>{item.designation}</TableCell>
+                  <TableCell>{item.technicalIdentifier}</TableCell>
+                  <TableCell>{item.version}</TableCell>
                   <TableCell>{item.baseUnit}</TableCell>
                   <TableCell className="text-center">
                     <Badge
@@ -102,7 +110,7 @@ export function InventoryTable({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی ثبت نشده است.'}
                 </TableCell>
               </TableRow>

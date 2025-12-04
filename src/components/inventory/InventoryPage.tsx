@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useTransition, useMemo, useRef } from 'react';
+import React, { useState, useTransition, useMemo, useRef, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Download, Search, Upload } from 'lucide-react';
@@ -26,22 +26,25 @@ export function InventoryPage({
   const [isImporting, startImportTransition] = useTransition();
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<any>(null);
+
+  useEffect(() => {
+    setMaterials(initialMaterials);
+  }, [initialMaterials]);
+
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCurrentPage(1); // Reset to first page on new search
     if (!searchTerm.trim()) {
       setSearchResults(null);
-      setMaterials(initialMaterials); // Reset to full list
       return;
     }
 
     startSearchTransition(async () => {
       try {
         const result = await intelligentMaterialSearch({ searchTerm });
-        const allMaterials = [...initialMaterials, ...materials.filter(m => !initialMaterials.find(im => im.id === m.id))];
-        const foundMaterials = allMaterials.filter(m => 
+        const foundMaterials = materials.filter(m => 
           result.results.some(res => m.description.toLowerCase().includes(res.toLowerCase()))
         );
         setSearchResults(foundMaterials);
@@ -64,6 +67,7 @@ export function InventoryPage({
     startImportTransition(async () => {
       try {
         await addMaterials(newMaterials);
+        // Prepend new materials to the existing list to show them at the top
         setMaterials(prev => [...newMaterials, ...prev]);
         toast({
           title: 'ایمپورت موفق',
@@ -84,6 +88,13 @@ export function InventoryPage({
         title: 'در حال آماده‌سازی خروجی',
         description: `خروجی ${format} به زودی آماده دانلود خواهد بود.`,
     });
+  }
+
+  const handleDelete = (id: string) => {
+    setMaterials(prev => prev.filter(m => m.id !== id));
+    if (searchResults) {
+      setSearchResults(prev => prev!.filter(m => m.id !== id));
+    }
   }
 
   const currentMaterials = searchResults !== null ? searchResults : materials;
@@ -143,6 +154,7 @@ export function InventoryPage({
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+          onDelete={handleDelete}
         />
       )}
     </div>

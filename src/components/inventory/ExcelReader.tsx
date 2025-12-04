@@ -33,7 +33,7 @@ export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, re
         const worksheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         
-        // Assuming headers are: 'Material Code', 'Description', 'Base Unit'
+        // Assuming headers are: 'Material Code', 'Description', 'Base Unit', 'Designation', 'Technical Identifier', 'Version'
         // And data starts from the second row
         const materials: Material[] = json.slice(1).map((row: any, index: number) => {
           const materialCode = String(row[0] || '');
@@ -43,6 +43,9 @@ export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, re
             description: String(row[1] || ''),
             baseUnit: String(row[2] || 'PC'),
             status: getStatusFromCode(materialCode),
+            designation: String(row[3] || ''),
+            technicalIdentifier: String(row[4] || ''),
+            version: String(row[5] || ''),
           };
         }).filter(m => m.materialCode && m.description); // Filter out empty rows
 

@@ -4,4 +4,7 @@ export type Material = {
   description: string;
   baseUnit: string;
   status: 'سالم' | 'معیوب';
+  designation?: string;
+  technicalIdentifier?: string;
+  version?: string;
 };
