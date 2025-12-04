@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { intelligentMaterialSearch } from '@/ai/flows/intelligent-material-search';
+import { searchMaterialsAction } from '@/app/actions/material-actions';
 import { addMaterials, getStatusFromCode, getMaterials, deleteMaterial } from '@/lib/data';
 import { Skeleton } from '../ui/skeleton';
 import { ExcelReader } from './ExcelReader';
@@ -31,7 +31,6 @@ export function InventoryPage({
   const fileInputRef = useRef<any>(null);
 
   useEffect(() => {
-    // On component mount, load materials from localStorage
     const loadMaterials = async () => {
       const storedMaterials = await getMaterials();
       setMaterials(storedMaterials);
@@ -49,8 +48,13 @@ export function InventoryPage({
 
     startSearchTransition(async () => {
       try {
-        const result = await intelligentMaterialSearch({ searchTerm });
         const allMaterials = await getMaterials();
+        const materialDescriptions = allMaterials.map(m => m.description);
+        
+        const result = await searchMaterialsAction({ 
+          searchTerm, 
+        });
+
         // The AI returns a list of matching description strings.
         // We filter the full material list to find the corresponding material objects.
         const foundMaterials = allMaterials.filter(m => 

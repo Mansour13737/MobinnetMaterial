@@ -2,10 +2,6 @@
 
 /**
  * @fileOverview AI-powered material search flow.
- *
- * - intelligentMaterialSearch - A function that performs intelligent material search.
- * - IntelligentMaterialSearchInput - The input type for the intelligentMaterialSearch function.
- * - IntelligentMaterialSearchOutput - The return type for the intelligentMaterialSearch function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -16,24 +12,12 @@ const IntelligentMaterialSearchInputSchema = z.object({
     .string()
     .describe('The search term provided by the user to find materials based on their description.'),
 });
-export type IntelligentMaterialSearchInput = z.infer<
-  typeof IntelligentMaterialSearchInputSchema
->;
 
 const IntelligentMaterialSearchOutputSchema = z.object({
   results: z
     .array(z.string())
     .describe('A list of material descriptions that semantically match the search term.'),
 });
-export type IntelligentMaterialSearchOutput = z.infer<
-  typeof IntelligentMaterialSearchOutputSchema
->;
-
-export async function intelligentMaterialSearch(
-  input: IntelligentMaterialSearchInput
-): Promise<IntelligentMaterialSearchOutput> {
-  return intelligentMaterialSearchFlow(input);
-}
 
 const intelligentMaterialSearchPrompt = ai.definePrompt({
   name: 'intelligentMaterialSearchPrompt',
@@ -60,3 +44,9 @@ const intelligentMaterialSearchFlow = ai.defineFlow(
     return output!;
   }
 );
+
+export async function intelligentMaterialSearch(
+  input: z.infer<typeof IntelligentMaterialSearchInputSchema>
+): Promise<z.infer<typeof IntelligentMaterialSearchOutputSchema>> {
+  return intelligentMaterialSearchFlow(input);
+}
