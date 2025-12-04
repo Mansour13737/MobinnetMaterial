@@ -8,74 +8,74 @@ body {
 
 @layer base {
   :root {
-    --background: 240 5% 96%;
-    --foreground: 240 10% 3.9%;
-    --card: 240 5% 98%;
+    --background: 228 60% 96%; /* Soft Space Gray #E7E9F2 */
+    --foreground: 240 5% 10%;
+    --card: 0 0% 100%; /* Crystal White #FFFFFF */
     --card-foreground: 240 10% 3.9%;
-    --popover: 240 5% 98%;
+    --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 220 85% 65%;
+    --primary: 202 100% 50%; /* Electric Neon Blue #00A7FF */
     --primary-foreground: 0 0% 100%;
-    --secondary: 270 60% 95%;
-    --secondary-foreground: 270 40% 15%;
-    --muted: 240 5% 90%;
+    --secondary: 220 15% 90%;
+    --secondary-foreground: 220 10% 10%;
+    --muted: 228 30% 92%;
     --muted-foreground: 240 4% 45%;
-    --accent: 330 90% 65%;
+    --accent: 322 100% 65%; /* Digital Pink Glow #FF4FD8 */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5% 85%;
-    --input: 240 5% 88%;
-    --ring: 220 85% 65%;
-    --chart-1: 220 85% 65%;
-    --chart-2: 330 90% 65%;
-    --chart-3: 270 60% 70%;
-    --chart-4: 180 80% 60%;
-    --chart-5: 45 90% 60%;
+    --border: 228 20% 88%;
+    --input: 228 20% 91%;
+    --ring: 202 100% 50%;
+    --chart-1: 202 100% 50%; /* Electric Neon Blue */
+    --chart-2: 322 100% 65%; /* Digital Pink Glow */
+    --chart-3: 261 100% 62%; /* Mystic Purple */
+    --chart-4: 169 82% 58%; /* Cyber Aqua Neon */
+    --chart-5: 41 100% 65%; /* Honey Glow Gold */
     --radius: 0.8rem;
-    --sidebar-background: 240 5% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 220 85% 65%;
+    --sidebar-primary: 202 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 92%;
+    --sidebar-accent: 228 40% 95%;
     --sidebar-accent-foreground: 240 10% 9%;
-    --sidebar-border: 240 5% 88%;
-    --sidebar-ring: 220 85% 65%;
+    --sidebar-border: 228 20% 90%;
+    --sidebar-ring: 202 100% 50%;
   }
   .dark {
-    --background: 250 20% 7%; /* Soft Space Gray / Matte Black */
-    --foreground: 0 0% 98%; /* Clean White */
-    --card: 250 20% 12%; /* Floating, Glassmorphism card */
+    --background: 240 4% 5%; /* Night Matte Black #0D0D0F */
+    --foreground: 0 0% 98%; /* Crystal White */
+    --card: 240 4% 10%; /* Floating, Glassmorphism card */
     --card-foreground: 0 0% 98%;
-    --popover: 250 20% 7%;
+    --popover: 240 4% 5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 220 90% 60%; /* Electric Neon Blue */
+    --primary: 202 100% 50%; /* Electric Neon Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 270 60% 18%; /* Mystic Purple tone */
+    --secondary: 261 50% 15%; /* Mystic Purple tone */
     --secondary-foreground: 0 0% 98%;
-    --muted: 270 20% 20%;
+    --muted: 261 20% 20%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 330 90% 60%; /* Digital Pink */
+    --accent: 322 100% 65%; /* Digital Pink Glow */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72.2% 50.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 250 20% 25%; /* Thin, glowing border */
-    --input: 250 20% 22%; /* Glass input */
-    --ring: 220 90% 65%; /* Focus Glow */
-    --chart-1: 220 90% 60%;
-    --chart-2: 330 90% 60%;
-    --chart-3: 270 60% 65%; /* Mystic Purple */
-    --chart-4: 180 80% 55%; /* Bright Turquoise */
-    --chart-5: 290 80% 70%; /* Light Metallic Purple */
+    --border: 240 4% 20%; /* Thin, glowing border */
+    --input: 240 4% 15%; /* Glass input */
+    --ring: 202 100% 55%; /* Focus Glow */
+    --chart-1: 202 100% 50%;
+    --chart-2: 322 100% 65%;
+    --chart-3: 261 100% 62%; /* Mystic Purple */
+    --chart-4: 169 82% 58%; /* Cyber Aqua Neon */
+    --chart-5: 265 60% 80%; /* Royal Purple Light */
     --radius: 1rem; /* Rounded corners */
-    --sidebar-background: 250 20% 10%;
+    --sidebar-background: 240 4% 8%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 220 90% 60%;
+    --sidebar-primary: 202 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 20% 20%;
+    --sidebar-accent: 240 4% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 250 20% 25%;
-    --sidebar-ring: 220 90% 65%;
+    --sidebar-border: 240 4% 20%;
+    --sidebar-ring: 202 100% 55%;
   }
 }
 
@@ -89,6 +89,6 @@ body {
 }
 
 html.dark {
-  background-image: radial-gradient(circle at 20% 20%, hsl(270 60% 18% / 0.3), transparent 30%),
-                    radial-gradient(circle at 80% 70%, hsl(220 90% 60% / 0.2), transparent 30%);
+  background-image: radial-gradient(circle at 20% 20%, hsl(261 100% 62% / 0.15), transparent 30%),
+                    radial-gradient(circle at 80% 70%, hsl(202 100% 50% / 0.1), transparent 30%);
 }
