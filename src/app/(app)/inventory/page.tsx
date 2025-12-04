@@ -197,7 +197,7 @@ export default function InventoryPage() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="جستجوی هوشمند متریال..."
+              placeholder="جستجوی هوشمند متریال (مثلا: چوپوقی دکل)..."
               className="w-full rounded-lg bg-background pr-10 h-12 text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

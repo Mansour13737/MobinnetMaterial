@@ -1,19 +1,29 @@
 'use server';
 /**
- * @fileOverview A flow for performing intelligent, semantic search over telecom materials.
+ * @fileOverview Implements an AI-powered semantic search for telecom materials using embeddings.
  *
- * - intelligentMaterialSearch - A function that handles the material search process.
- * - IntelligentMaterialSearchInput - The input type for the function.
- * - IntelligentMaterialSearchOutput - The return type for the function.
+ * - intelligentMaterialSearch: The main flow function.
+ * - IntelligentMaterialSearchInput: Input type for the search.
+ * - IntelligentMaterialSearchOutput: Output type for the search.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import type { Material } from '@/lib/types';
+import { cosine } from 'ml-distance';
+import { embed, embedMany } from 'genkit/ai';
 import { googleAI } from '@genkit-ai/google-genai';
 
+// Helper schema for the structured query interpretation
+const InterpretedQuerySchema = z.object({
+  keywords: z.array(z.string()).describe('Clean, normalized keywords from the query.'),
+  materialTypes: z.array(z.string()).optional().describe('Specific material types mentioned.'),
+  conditions: z.array(z.string()).optional().describe('Material conditions like "healthy" or "damaged".'),
+  extra: z.string().optional().describe('Additional context or likely user intent.'),
+});
+
 const IntelligentMaterialSearchInputSchema = z.object({
-  searchQuery: z.string().describe('The user\'s search query, which could be a technical term, a colloquialism, or a partial description.'),
+  searchQuery: z.string().describe("The user's search query."),
   materials: z.array(z.object({
     id: z.string(),
     materialCode: z.string(),
@@ -23,40 +33,36 @@ const IntelligentMaterialSearchInputSchema = z.object({
   })).describe('The complete list of materials to search through.'),
 });
 
-// The output is an array of the full material objects that are deemed relevant.
 const IntelligentMaterialSearchOutputSchema = z.array(z.object({
-    id: z.string(),
-    materialCode: z.string(),
-    description: z.string(),
-    partNumber: z.string().optional(),
-    status: z.enum(['سالم', 'معیوب']),
+  id: z.string(),
+  materialCode: z.string(),
+  description: z.string(),
+  partNumber: z.string().optional(),
+  status: z.enum(['سالم', 'معیوب']),
 }));
 
 export type IntelligentMaterialSearchInput = z.infer<typeof IntelligentMaterialSearchInputSchema>;
 export type IntelligentMaterialSearchOutput = z.infer<typeof IntelligentMaterialSearchOutputSchema>;
 
-const intelligentMaterialSearchPrompt = ai.definePrompt({
-  name: 'intelligentMaterialSearchPrompt',
-  model: googleAI.model('gemini-pro'),
-  input: { schema: IntelligentMaterialSearchInputSchema },
-  output: { schema: IntelligentMaterialSearchOutputSchema },
-  prompt: `You are an expert assistant for a telecommunications tower materials inventory. Your task is to perform an intelligent, semantic search.
+// 1. Prompt to interpret the user's raw query into a structured format
+const interpretQueryPrompt = ai.definePrompt({
+  name: 'interpretMaterialQuery',
+  input: { schema: z.object({ searchQuery: z.string() }) },
+  output: { schema: InterpretedQuerySchema },
+  prompt: `You are an expert material and inventory analyzer for telecommunication towers.
+Your task is to take a user search query and convert it into a clean, normalized keyword set that describes what the user is looking for.
 
-You understand technical terms, part numbers, and even colloquial or slang terms (like "چوپوقی" for a gooseneck pipe).
+Rules:
+- Understand the intent, even if the query is vague.
+- Extract the essential technical meaning.
+- Remove unnecessary words.
+- If the query is related to telecom tower materials, normalize names (e.g., "چوپوقی" should be interpreted as gooseneck pipe or a related item).
+- Return JSON format.
 
-The user has provided a search query: "{{searchQuery}}"
-
-Here is the list of all available materials:
-{{#each materials}}
-- ID: {{id}}, Code: {{materialCode}}, Description: "{{description}}", Part Number: {{partNumber}}
-{{/each}}
-
-Based on the user's search query, identify the most relevant materials from the list. The result should be an array of the full material objects that match. A match can be based on the material code, description, partNumber, or a semantic understanding of the query.
-
-Return an array of the complete, original material objects that are the best matches. If no relevant materials are found, return an empty array.
-`,
+User query: "{{searchQuery}}"`,
 });
 
+// The main flow for semantic search
 const intelligentMaterialSearchFlow = ai.defineFlow(
   {
     name: 'intelligentMaterialSearchFlow',
@@ -67,12 +73,55 @@ const intelligentMaterialSearchFlow = ai.defineFlow(
     if (!input.searchQuery || input.materials.length === 0) {
       return [];
     }
-    const { output } = await intelligentMaterialSearchPrompt(input);
-    return output || [];
+
+    // A. Interpret the user's query to get structured keywords
+    const interpretedQueryResponse = await interpretQueryPrompt({ searchQuery: input.searchQuery });
+    const interpretedQuery = interpretedQueryResponse.output;
+    if (!interpretedQuery?.keywords.length) {
+      return []; // No keywords extracted, no results
+    }
+
+    const queryText = interpretedQuery.keywords.join(' ');
+    const embeddingModel = googleAI.model('text-embedding-004');
+
+    // B. Generate embedding for the interpreted user query
+    const queryEmbedding = await embed({
+      model: embeddingModel,
+      content: queryText,
+    });
+
+    // C. Generate embeddings for all material items
+    // We combine description and material code for a richer context.
+    const materialContents = input.materials.map(
+      (m) => `${m.description} (Code: ${m.materialCode})`
+    );
+
+    const { embeddings: itemEmbeddings } = await embedMany({
+      model: embeddingModel,
+      content: materialContents,
+    });
+
+
+    // D. Calculate cosine similarity and filter results
+    const SIMILARITY_THRESHOLD = 0.7; // Threshold for a good match
+    const similarMaterials: Material[] = [];
+
+    itemEmbeddings.forEach((itemEmbedding, index) => {
+      // ml-distance calculates distance (0=identical, 2=opposite), so we convert it to similarity (1=identical, -1=opposite)
+      const similarity = 1 - cosine(queryEmbedding, itemEmbedding);
+      if (similarity >= SIMILARITY_THRESHOLD) {
+        similarMaterials.push(input.materials[index]);
+      }
+    });
+
+    return similarMaterials;
   }
 );
 
-
+/**
+ * Executes the semantic search flow.
+ * This is the primary function to be called from server actions.
+ */
 export async function intelligentMaterialSearch(input: IntelligentMaterialSearchInput): Promise<IntelligentMaterialSearchOutput> {
   return await intelligentMaterialSearchFlow(input);
 }
