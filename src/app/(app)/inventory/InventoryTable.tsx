@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Material } from '@/lib/types';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -34,6 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { buttonVariants } from "@/components/ui/button"
 
 export function InventoryTable({
   materials,
@@ -184,5 +185,3 @@ export function InventoryTable({
     </Card>
   );
 }
-
-import { buttonVariants } from "@/components/ui/button"

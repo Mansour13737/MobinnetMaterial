@@ -4,12 +4,12 @@ import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Download, Search, Upload, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { InventoryTable } from './InventoryTable';
+import { InventoryTable } from '@/app/(app)/inventory/InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ExcelReader } from './ExcelReader';
-import { AddMaterialForm } from './AddMaterialForm';
+import { ExcelReader } from '@/app/(app)/inventory/ExcelReader';
+import { AddMaterialForm } from '@/app/(app)/inventory/AddMaterialForm';
 import { useMaterialStore } from '@/store/material-store';
 import { searchMaterialsAction } from '@/app/actions/material-actions';
 
