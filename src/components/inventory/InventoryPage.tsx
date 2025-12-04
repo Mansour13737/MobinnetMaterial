@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useTransition, useMemo } from 'react';
+import React, { useState, useTransition, useMemo, useRef } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Download, Search, Upload } from 'lucide-react';
@@ -8,8 +8,9 @@ import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { intelligentMaterialSearch } from '@/ai/flows/intelligent-material-search';
-import { importFromExcel as importAction } from '@/lib/data';
+import { addMaterials } from '@/lib/data';
 import { Skeleton } from '../ui/skeleton';
+import { ExcelReader } from './ExcelReader';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -25,6 +26,7 @@ export function InventoryPage({
   const [isImporting, startImportTransition] = useTransition();
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,7 +40,8 @@ export function InventoryPage({
     startSearchTransition(async () => {
       try {
         const result = await intelligentMaterialSearch({ searchTerm });
-        const foundMaterials = initialMaterials.filter(m => 
+        const allMaterials = [...initialMaterials, ...materials.filter(m => !initialMaterials.find(im => im.id === m.id))];
+        const foundMaterials = allMaterials.filter(m => 
           result.results.some(res => m.description.toLowerCase().includes(res.toLowerCase()))
         );
         setSearchResults(foundMaterials);
@@ -53,21 +56,24 @@ export function InventoryPage({
     });
   };
   
-  const handleImport = () => {
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileProcessed = (newMaterials: Material[]) => {
     startImportTransition(async () => {
       try {
-        const count = await importAction();
+        await addMaterials(newMaterials);
+        setMaterials(prev => [...newMaterials, ...prev]);
         toast({
-            title: 'ایمپورت موفق',
-            description: `${count} آیتم جدید با موفقیت از فایل اکسل ایمپورت شد.`,
+          title: 'ایمپورت موفق',
+          description: `${newMaterials.length} آیتم جدید با موفقیت از فایل اکسل ایمپورت شد.`,
         });
-        // In a real app, you would refetch data. For now, we reload.
-        window.location.reload();
       } catch (error) {
          toast({
           variant: 'destructive',
           title: 'خطا در ایمپورت',
-          description: 'فرایند ایمپورت با مشکل مواجه شد.',
+          description: 'فرایند ذخیره داده‌های ایمپورت شده با مشکل مواجه شد.',
         });
       }
     });
@@ -99,9 +105,10 @@ export function InventoryPage({
               <Download className="ml-2 h-4 w-4" />
               خروجی Excel
             </Button>
-            <Button onClick={handleImport} disabled={isImporting}>
+            <Button onClick={handleImportClick} disabled={isImporting}>
               {isImporting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
             </Button>
+            <ExcelReader ref={fileInputRef} onFileProcessed={handleFileProcessed} />
           </div>
         }
       />

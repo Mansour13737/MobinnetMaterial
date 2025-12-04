@@ -1,7 +1,7 @@
 import { Material } from './types';
 
 // Function to determine status based on material code
-const getStatusFromCode = (code: string): 'سالم' | 'معیوب' => {
+export const getStatusFromCode = (code: string): 'سالم' | 'معیوب' => {
   const codeStr = String(code);
   if (codeStr.startsWith('M')) return 'سالم';
   if (codeStr.startsWith('N')) return 'معیوب';
@@ -42,22 +42,12 @@ export const getMaterials = async (): Promise<Material[]> => {
   return materials;
 };
 
-export const importFromExcel = async () => {
-    // This is a simulation. In a real app, you'd parse an Excel file.
-    await delay(1500);
-    const newItems: Material[] = Array.from({ length: 10 }).map((_, i) => {
-        const materialCode = `M${Date.now() + i}`;
-        return {
-            id: `imported-${Date.now()}-${i}`,
-            materialCode: materialCode,
-            description: `آیتم ایمپورتی ${i + 1}`,
-            baseUnit: 'PC',
-            status: getStatusFromCode(materialCode),
-        }
-    });
-    materials = [...newItems, ...materials];
-    return newItems.length;
+export const addMaterials = async (newMaterials: Material[]): Promise<Material[]> => {
+  await delay(200);
+  materials = [...newMaterials, ...materials];
+  return materials;
 }
+
 
 export const deleteMaterial = async (id: string): Promise<boolean> => {
     await delay(400);
