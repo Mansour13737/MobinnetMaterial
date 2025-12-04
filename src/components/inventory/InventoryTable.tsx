@@ -74,7 +74,6 @@ export function InventoryTable({
               <TableHead>Designation</TableHead>
               <TableHead>Technical Identifier</TableHead>
               <TableHead>Version</TableHead>
-              <TableHead>واحد</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
               <TableHead className="text-left">عملیات</TableHead>
             </TableRow>
@@ -88,7 +87,6 @@ export function InventoryTable({
                   <TableCell>{item.designation}</TableCell>
                   <TableCell>{item.technicalIdentifier}</TableCell>
                   <TableCell>{item.version}</TableCell>
-                  <TableCell>{item.baseUnit}</TableCell>
                   <TableCell className="text-center">
                     <Badge
                       variant={
@@ -110,7 +108,7 @@ export function InventoryTable({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی ثبت نشده است.'}
                 </TableCell>
               </TableRow>

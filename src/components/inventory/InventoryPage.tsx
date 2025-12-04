@@ -2,15 +2,16 @@
 import React, { useState, useTransition, useMemo, useRef, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Download, Search, Upload } from 'lucide-react';
+import { Download, Search, Upload, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { intelligentMaterialSearch } from '@/ai/flows/intelligent-material-search';
-import { addMaterials } from '@/lib/data';
+import { addMaterials, getStatusFromCode } from '@/lib/data';
 import { Skeleton } from '../ui/skeleton';
 import { ExcelReader } from './ExcelReader';
+import { AddMaterialForm } from './AddMaterialForm';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -24,6 +25,7 @@ export function InventoryPage({
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, startSearchTransition] = useTransition();
   const [isImporting, startImportTransition] = useTransition();
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const fileInputRef = useRef<any>(null);
@@ -67,7 +69,6 @@ export function InventoryPage({
     startImportTransition(async () => {
       try {
         await addMaterials(newMaterials);
-        // Prepend new materials to the existing list to show them at the top
         setMaterials(prev => [...newMaterials, ...prev]);
         toast({
           title: 'ایمپورت موفق',
@@ -81,6 +82,31 @@ export function InventoryPage({
         });
       }
     });
+  }
+
+  const handleAddMaterial = (newMaterialData: Omit<Material, 'id' | 'status'>) => {
+     startImportTransition(async () => {
+       try {
+        const newMaterial: Material = {
+          ...newMaterialData,
+          id: `manual-${Date.now()}`,
+          status: getStatusFromCode(newMaterialData.materialCode),
+        };
+        await addMaterials([newMaterial]);
+        setMaterials(prev => [newMaterial, ...prev]);
+        toast({
+          title: 'افزودن موفق',
+          description: `متریال "${newMaterial.description}" با موفقیت اضافه شد.`,
+        });
+        setAddModalOpen(false);
+       } catch (error) {
+         toast({
+            variant: 'destructive',
+            title: 'خطا در افزودن متریال',
+            description: 'فرایند ذخیره داده‌ها با مشکل مواجه شد.',
+          });
+       }
+     });
   }
 
   const handleExport = (format: 'Excel' | 'PDF') => {
@@ -112,6 +138,10 @@ export function InventoryPage({
         title="لیست متریال"
         actions={
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setAddModalOpen(true)}>
+                <Plus className="ml-2 h-4 w-4" />
+                افزودن متریال جدید
+            </Button>
             <Button onClick={() => handleExport('Excel')}>
               <Download className="ml-2 h-4 w-4" />
               خروجی Excel
@@ -120,6 +150,12 @@ export function InventoryPage({
               {isImporting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
             </Button>
             <ExcelReader ref={fileInputRef} onFileProcessed={handleFileProcessed} />
+            <AddMaterialForm 
+              isOpen={isAddModalOpen} 
+              onOpenChange={setAddModalOpen} 
+              onAddMaterial={handleAddMaterial}
+              isSubmitting={isImporting}
+            />
           </div>
         }
       />
