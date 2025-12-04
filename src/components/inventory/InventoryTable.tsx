@@ -8,18 +8,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Material } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Trash2 } from 'lucide-react';
-import { useUserRole } from '../layout/UserNav';
 import { useToast } from '@/hooks/use-toast';
 import { deleteMaterial } from '@/lib/data';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-export function InventoryTable({ materials, hasSearchResults }: { materials: Material[], hasSearchResults: boolean }) {
-  const { role } = useUserRole();
-  const canEdit = role === 'مدیر' || role === 'انباردار';
+export function InventoryTable({
+  materials,
+  hasSearchResults,
+  currentPage,
+  totalPages,
+  onPageChange
+}: {
+  materials: Material[],
+  hasSearchResults: boolean,
+  currentPage: number,
+  totalPages: number,
+  onPageChange: (page: number) => void
+}) {
   const { toast } = useToast();
 
   const handleDelete = async (id: string) => {
@@ -34,6 +52,14 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
     }
   };
 
+  const handlePreviousPage = () => {
+    onPageChange(Math.max(1, currentPage - 1));
+  };
+
+  const handleNextPage = () => {
+    onPageChange(Math.min(totalPages, currentPage + 1));
+  };
+
 
   return (
     <Card>
@@ -45,7 +71,7 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
               <TableHead>شرح متریال</TableHead>
               <TableHead>واحد</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
-              {canEdit && <TableHead className="text-left">عملیات</TableHead>}
+              <TableHead className="text-left">عملیات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -65,20 +91,18 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
                       {item.status}
                     </Badge>
                   </TableCell>
-                   {canEdit && (
-                    <TableCell className="text-left">
-                       <div className="flex items-center justify-end gap-2">
-                         <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
-                            <Trash2 className="h-4 w-4" />
-                         </Button>
-                       </div>
-                    </TableCell>
-                  )}
+                  <TableCell className="text-left">
+                     <div className="flex items-center justify-end gap-2">
+                       <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
+                          <Trash2 className="h-4 w-4" />
+                       </Button>
+                     </div>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={canEdit ? 5 : 4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی ثبت نشده است.'}
                 </TableCell>
               </TableRow>
@@ -86,6 +110,33 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
           </TableBody>
         </Table>
       </CardContent>
+      {totalPages > 1 && (
+        <CardFooter className="flex items-center justify-between pt-6">
+           <div className="text-sm text-muted-foreground">
+             صفحه {currentPage} از {totalPages}
+           </div>
+           <Pagination className="mx-0 w-auto">
+             <PaginationContent>
+               <PaginationItem>
+                 <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} />
+               </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#" isActive>
+                    {currentPage}
+                  </PaginationLink>
+                </PaginationItem>
+                {currentPage < totalPages && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+               <PaginationItem>
+                 <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }}/>
+               </PaginationItem>
+             </PaginationContent>
+           </Pagination>
+        </CardFooter>
+      )}
     </Card>
   );
 }

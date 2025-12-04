@@ -1,16 +1,17 @@
 'use client';
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useMemo } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Download, Plus, Search, Upload } from 'lucide-react';
+import { Download, Search, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { intelligentMaterialSearch } from '@/ai/flows/intelligent-material-search';
-import { useUserRole } from '@/components/layout/UserNav';
 import { importFromExcel as importAction } from '@/lib/data';
 import { Skeleton } from '../ui/skeleton';
+
+const ITEMS_PER_PAGE = 10;
 
 export function InventoryPage({
   initialMaterials,
@@ -22,13 +23,12 @@ export function InventoryPage({
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, startSearchTransition] = useTransition();
   const [isImporting, startImportTransition] = useTransition();
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
-  const { role } = useUserRole();
-
-  const canEdit = role === 'مدیر' || role === 'انباردار';
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setCurrentPage(1); // Reset to first page on new search
     if (!searchTerm.trim()) {
       setSearchResults(null);
       setMaterials(initialMaterials); // Reset to full list
@@ -38,7 +38,6 @@ export function InventoryPage({
     startSearchTransition(async () => {
       try {
         const result = await intelligentMaterialSearch({ searchTerm });
-        // This is a simulation. We filter the existing materials based on the AI result descriptions.
         const foundMaterials = initialMaterials.filter(m => 
           result.results.some(res => m.description.toLowerCase().includes(res.toLowerCase()))
         );
@@ -62,8 +61,7 @@ export function InventoryPage({
             title: 'ایمپورت موفق',
             description: `${count} آیتم جدید با موفقیت از فایل اکسل ایمپورت شد.`,
         });
-        // This is a placeholder for refetching data.
-        // In a real app, you would invalidate a query cache or refetch.
+        // In a real app, you would refetch data. For now, we reload.
         window.location.reload();
       } catch (error) {
          toast({
@@ -82,24 +80,29 @@ export function InventoryPage({
     });
   }
 
-  const displayedMaterials = searchResults !== null ? searchResults : materials;
+  const currentMaterials = searchResults !== null ? searchResults : materials;
+  const totalPages = Math.ceil(currentMaterials.length / ITEMS_PER_PAGE);
+
+  const paginatedMaterials = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return currentMaterials.slice(startIndex, endIndex);
+  }, [currentMaterials, currentPage]);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="لیست متریال"
         actions={
-          canEdit && (
-            <div className="flex gap-2">
-              <Button onClick={() => handleExport('Excel')}>
-                <Download className="ml-2 h-4 w-4" />
-                خروجی Excel
-              </Button>
-              <Button onClick={handleImport} disabled={isImporting}>
-                {isImporting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
-              </Button>
-            </div>
-          )
+          <div className="flex gap-2">
+            <Button onClick={() => handleExport('Excel')}>
+              <Download className="ml-2 h-4 w-4" />
+              خروجی Excel
+            </Button>
+            <Button onClick={handleImport} disabled={isImporting}>
+              {isImporting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
+            </Button>
+          </div>
         }
       />
 
@@ -128,8 +131,11 @@ export function InventoryPage({
         </div>
       ) : (
         <InventoryTable
-          materials={displayedMaterials}
+          materials={paginatedMaterials}
           hasSearchResults={searchResults !== null}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       )}
     </div>

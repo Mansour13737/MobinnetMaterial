@@ -5,5 +5,3 @@ export type Material = {
   baseUnit: string;
   status: 'سالم' | 'معیوب';
 };
-
-export type UserRole = 'مدیر' | 'انباردار' | 'مشاهده‌گر';
