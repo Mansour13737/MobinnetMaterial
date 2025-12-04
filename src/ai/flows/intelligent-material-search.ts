@@ -10,8 +10,8 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import type { Material } from '@/lib/types';
-import { cosine } from 'ml-distance';
-import { embed, embedMany } from 'genkit/ai';
+import { distance } from 'ml-distance';
+import { embed, embedMany } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
 // Helper schema for the structured query interpretation
@@ -62,6 +62,15 @@ Rules:
 User query: "{{searchQuery}}"`,
 });
 
+
+// Helper to convert cosine distance to cosine similarity
+function cosineSimilarity(x: number[], y: number[]): number {
+  // cosine distance is 1 - cosine similarity
+  // ml-distance's cosine function returns the cosine distance
+  return 1 - distance.cosine(x, y);
+}
+
+
 // The main flow for semantic search
 const intelligentMaterialSearchFlow = ai.defineFlow(
   {
@@ -107,8 +116,7 @@ const intelligentMaterialSearchFlow = ai.defineFlow(
     const similarMaterials: Material[] = [];
 
     itemEmbeddings.forEach((itemEmbedding, index) => {
-      // ml-distance calculates distance (0=identical, 2=opposite), so we convert it to similarity (1=identical, -1=opposite)
-      const similarity = 1 - cosine(queryEmbedding, itemEmbedding);
+      const similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
       if (similarity >= SIMILARITY_THRESHOLD) {
         similarMaterials.push(input.materials[index]);
       }
