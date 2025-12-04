@@ -49,7 +49,7 @@ Here is the list of all available materials:
 - ID: {{id}}, Code: {{materialCode}}, Description: "{{description}}", Part Number: {{partNumber}}
 {{/each}}
 
-Based on the user's search query, identify the most relevant materials from the list. The result should be an array of the full material objects that match. A match can be based on the material code, description, part number, or a semantic understanding of the query.
+Based on the user's search query, identify the most relevant materials from the list. The result should be an array of the full material objects that match. A match can be based on the material code, description, partNumber, or a semantic understanding of the query.
 
 Return an array of the complete, original material objects that are the best matches. If no relevant materials are found, return an empty array.
 `,
@@ -71,6 +71,6 @@ const intelligentMaterialSearchFlow = ai.defineFlow(
 );
 
 
-export async function intelligentMaterialSearch(input: Intelligent-MaterialSearchInput): Promise<IntelligentMaterialSearchOutput> {
+export async function intelligentMaterialSearch(input: IntelligentMaterialSearchInput): Promise<IntelligentMaterialSearchOutput> {
   return await intelligentMaterialSearchFlow(input);
 }

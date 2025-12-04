@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { InventoryTable } from './InventoryTable';
 import type { Material } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '../ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ExcelReader } from './ExcelReader';
 import { AddMaterialForm } from './AddMaterialForm';
 import { useMaterialStore } from '@/store/material-store';
@@ -15,7 +15,7 @@ import { searchMaterialsAction } from '@/app/actions/material-actions';
 
 const ITEMS_PER_PAGE = 10;
 
-export function InventoryPage() {
+export default function InventoryPage() {
   const { 
     materials, 
     addMaterials, 
