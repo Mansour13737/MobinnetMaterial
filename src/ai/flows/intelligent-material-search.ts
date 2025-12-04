@@ -10,7 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import type { Material } from '@/lib/types';
-import { geminiPro } from 'genkit/models';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const IntelligentMaterialSearchInputSchema = z.object({
   searchQuery: z.string().describe('The user\'s search query, which could be a technical term, a colloquialism, or a partial description.'),
@@ -37,7 +37,7 @@ export type IntelligentMaterialSearchOutput = z.infer<typeof IntelligentMaterial
 
 const intelligentMaterialSearchPrompt = ai.definePrompt({
   name: 'intelligentMaterialSearchPrompt',
-  model: geminiPro,
+  model: googleAI.model('gemini-pro'),
   input: { schema: IntelligentMaterialSearchInputSchema },
   output: { schema: IntelligentMaterialSearchOutputSchema },
   prompt: `You are an expert assistant for a telecommunications tower materials inventory. Your task is to perform an intelligent, semantic search.
