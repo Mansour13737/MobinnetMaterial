@@ -43,38 +43,39 @@ body {
     --sidebar-ring: 220 85% 65%;
   }
   .dark {
-    --background: 240 10% 5%;
-    --foreground: 0 0% 98%;
-    --card: 250 15% 12%;
+    --background: 250 20% 7%; /* Soft Space Gray / Matte Black */
+    --foreground: 0 0% 98%; /* Clean White */
+    --card: 250 20% 12%; /* Floating, Glassmorphism card */
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 5%;
+    --popover: 250 20% 7%;
     --popover-foreground: 0 0% 98%;
-    --primary: 220 90% 60%;
-    --primary-foreground: 220 10% 10%;
-    --secondary: 270 20% 15%;
+    --primary: 220 90% 60%; /* Electric Neon Blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 60% 18%; /* Mystic Purple tone */
     --secondary-foreground: 0 0% 98%;
-    --muted: 270 10% 20%;
+    --muted: 270 20% 20%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 330 90% 55%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --accent: 330 90% 60%; /* Digital Pink */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72.2% 50.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 250 15% 20%;
-    --input: 250 15% 22%;
-    --ring: 220 90% 60%;
+    --border: 250 20% 25%; /* Thin, glowing border */
+    --input: 250 20% 22%; /* Glass input */
+    --ring: 220 90% 65%; /* Focus Glow */
     --chart-1: 220 90% 60%;
-    --chart-2: 330 90% 55%;
-    --chart-3: 270 60% 50%;
-    --chart-4: 180 80% 50%;
-    --chart-5: 45 90% 50%;
-    --sidebar-background: 240 10% 5%;
+    --chart-2: 330 90% 60%;
+    --chart-3: 270 60% 65%; /* Mystic Purple */
+    --chart-4: 180 80% 55%; /* Bright Turquoise */
+    --chart-5: 290 80% 70%; /* Light Metallic Purple */
+    --radius: 1rem; /* Rounded corners */
+    --sidebar-background: 250 20% 10%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 220 90% 60%;
-    --sidebar-primary-foreground: 220 10% 10%;
-    --sidebar-accent: 250 15% 15%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 20% 20%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 250 15% 20%;
-    --sidebar-ring: 220 90% 60%;
+    --sidebar-border: 250 20% 25%;
+    --sidebar-ring: 220 90% 65%;
   }
 }
 
@@ -85,4 +86,9 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html.dark {
+  background-image: radial-gradient(circle at 20% 20%, hsl(270 60% 18% / 0.3), transparent 30%),
+                    radial-gradient(circle at 80% 70%, hsl(220 90% 60% / 0.2), transparent 30%);
 }
