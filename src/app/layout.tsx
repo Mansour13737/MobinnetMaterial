@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter, Source_Code_Pro } from 'next/font/google';
+import { Source_Code_Pro, Vazirmatn } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 
-const fontBody = Inter({
-  subsets: ['latin'],
+const fontBody = Vazirmatn({
+  subsets: ['arabic', 'latin'],
   variable: '--font-body',
 });
 
