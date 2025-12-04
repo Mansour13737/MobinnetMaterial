@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -12,9 +11,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Material } from '@/lib/types';
-import { format } from 'date-fns-jalali';
 import { Button } from '../ui/button';
-import { Edit, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useUserRole } from '../layout/UserNav';
 import { useToast } from '@/hooks/use-toast';
 import { deleteMaterial } from '@/lib/data';
@@ -43,12 +41,10 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>نام متریال</TableHead>
-              <TableHead>دسته‌بندی</TableHead>
-              <TableHead>کد سالم</TableHead>
-              <TableHead className="text-center">تعداد</TableHead>
+              <TableHead>کد متریال</TableHead>
+              <TableHead>شرح متریال</TableHead>
+              <TableHead>واحد</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
-              <TableHead>آخرین بروزرسانی</TableHead>
               {canEdit && <TableHead className="text-left">عملیات</TableHead>}
             </TableRow>
           </TableHeader>
@@ -56,14 +52,9 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
             {materials.length > 0 ? (
               materials.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">
-                    <Link href={`/inventory/${item.id}`} className="hover:text-primary hover:underline">
-                      {item.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell className="font-code">{item.healthyCode}</TableCell>
-                  <TableCell className="text-center font-medium">{item.quantity.toLocaleString('fa-IR')}</TableCell>
+                  <TableCell className="font-medium font-code">{item.materialCode}</TableCell>
+                  <TableCell>{item.description}</TableCell>
+                  <TableCell>{item.baseUnit}</TableCell>
                   <TableCell className="text-center">
                     <Badge
                       variant={
@@ -74,15 +65,9 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
                       {item.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{format(new Date(item.lastUpdated), 'yyyy/MM/dd')}</TableCell>
                    {canEdit && (
                     <TableCell className="text-left">
                        <div className="flex items-center justify-end gap-2">
-                         <Button variant="ghost" size="icon" asChild>
-                           <Link href={`/inventory/${item.id}?edit=true`}>
-                              <Edit className="h-4 w-4" />
-                           </Link>
-                         </Button>
                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
                             <Trash2 className="h-4 w-4" />
                          </Button>
@@ -93,8 +78,8 @@ export function InventoryTable({ materials, hasSearchResults }: { materials: Mat
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={canEdit ? 7 : 6} className="h-24 text-center">
-                  {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی در موجودی ثبت نشده است.'}
+                <TableCell colSpan={canEdit ? 5 : 4} className="h-24 text-center">
+                  {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی ثبت نشده است.'}
                 </TableCell>
               </TableRow>
             )}

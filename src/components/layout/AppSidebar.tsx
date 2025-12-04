@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Boxes, LayoutDashboard, TowerControl } from 'lucide-react';
+import { List, TowerControl } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function AppSidebar() {
@@ -19,14 +19,9 @@ export function AppSidebar() {
 
   const menuItems = [
     {
-      href: '/dashboard',
-      label: 'داشبورد',
-      icon: LayoutDashboard,
-    },
-    {
       href: '/inventory',
-      label: 'موجودی',
-      icon: Boxes,
+      label: 'لیست متریال',
+      icon: List,
     },
   ];
 
@@ -36,7 +31,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2 p-2">
            <TowerControl className="h-8 w-8 text-primary" />
            <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">
-             TowerTrack
+             Material List
            </span>
         </div>
       </SidebarHeader>
@@ -44,7 +39,7 @@ export function AppSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <Link href={item.href} passHref>
+              <Link href={item.href}>
                 <SidebarMenuButton
                   as="a"
                   isActive={pathname.startsWith(item.href)}

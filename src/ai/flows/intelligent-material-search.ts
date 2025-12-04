@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const IntelligentMaterialSearchInputSchema = z.object({
   searchTerm: z
     .string()
-    .describe('The search term provided by the user to find materials.'),
+    .describe('The search term provided by the user to find materials based on their description.'),
 });
 export type IntelligentMaterialSearchInput = z.infer<
   typeof IntelligentMaterialSearchInputSchema
@@ -39,13 +39,13 @@ const intelligentMaterialSearchPrompt = ai.definePrompt({
   name: 'intelligentMaterialSearchPrompt',
   input: {schema: IntelligentMaterialSearchInputSchema},
   output: {schema: IntelligentMaterialSearchOutputSchema},
-  prompt: `You are an AI assistant specialized in searching for materials in an inventory system.
+  prompt: `You are an AI assistant specialized in searching for materials in a list based on user queries.
 
-  The user will provide a search term, and you should return a list of material descriptions that closely match the search term. Consider potential typos, vague descriptions, and similar items.
+  The user will provide a search term, and you should return a list of keywords or phrases from the material description that closely match the search term. Consider potential typos, vague descriptions, and similar items.
 
   Search Term: {{{searchTerm}}}
 
-  Results:
+  Return the keywords found in the material descriptions.
   `,
 });
 

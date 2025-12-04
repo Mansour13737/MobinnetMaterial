@@ -40,7 +40,7 @@ export function InventoryPage({
         const result = await intelligentMaterialSearch({ searchTerm });
         // This is a simulation. We filter the existing materials based on the AI result descriptions.
         const foundMaterials = initialMaterials.filter(m => 
-          result.results.some(res => m.name.includes(res) || res.includes(m.name))
+          result.results.some(res => m.description.toLowerCase().includes(res.toLowerCase()))
         );
         setSearchResults(foundMaterials);
       } catch (error) {
@@ -87,7 +87,7 @@ export function InventoryPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="مدیریت موجودی"
+        title="لیست متریال"
         actions={
           canEdit && (
             <div className="flex gap-2">
@@ -97,10 +97,6 @@ export function InventoryPage({
               </Button>
               <Button onClick={handleImport} disabled={isImporting}>
                 {isImporting ? 'در حال پردازش...' : <><Upload className="ml-2 h-4 w-4" /> ایمپورت از Excel</>}
-              </Button>
-              <Button variant="default">
-                <Plus className="ml-2 h-4 w-4" />
-                افزودن آیتم جدید
               </Button>
             </div>
           )
@@ -113,7 +109,7 @@ export function InventoryPage({
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="جستجوی هوشمند متریال (مثال: پیچ ۱۲ گالوانیزه، دکل سبک ۲۰ متری...)"
+              placeholder="جستجوی هوشمند در شرح متریال..."
               className="w-full rounded-lg bg-background pr-10 h-12 text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
