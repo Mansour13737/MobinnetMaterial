@@ -3,7 +3,6 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import type { Material } from '@/lib/types';
-import { getStatusFromCode } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExcelReaderProps {
@@ -31,17 +30,16 @@ export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, re
         const workbook = XLSX.read(data, { type: 'binary' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        const json: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         
-        // Assuming headers are in the first row
-        // No.,Material,Material description,Part Number
+        // Assuming headers are: No.,Material,Material description,Part Number
         const materials: Omit<Material, 'id' | 'status'>[] = json.slice(1).map((row: any) => {
           return {
             materialCode: String(row[1] || ''),
             description: String(row[2] || ''),
-            partNumber: String(row[4] || ''), // Corresponds to Part Number column
+            partNumber: String(row[3] || ''),
           };
-        }).filter(m => m.materialCode && m.description); // Filter out empty rows
+        }).filter(m => m.materialCode && m.description);
 
         if(materials.length > 0) {
             onFileProcessed(materials);
@@ -60,7 +58,6 @@ export const ExcelReader = forwardRef(({ onFileProcessed }: ExcelReaderProps, re
             description: 'امکان خواندن فایل اکسل وجود ندارد. لطفاً مطمئن شوید فایل معتبر است.',
         });
       } finally {
-        // Reset file input to allow selecting the same file again
         if(inputRef.current) {
             inputRef.current.value = '';
         }

@@ -14,7 +14,17 @@ import type { Material } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { deleteMaterial } from '@/lib/data';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import {
   Pagination,
   PaginationContent,
@@ -42,16 +52,8 @@ export function InventoryTable({
 }) {
   const { toast } = useToast();
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('آیا از حذف این آیتم اطمینان دارید؟ این عمل غیرقابل بازگشت است.')) return;
-    
-    const result = await deleteMaterial(id);
-    if(result) {
-        toast({ title: 'موفقیت', description: 'آیتم با موفقیت حذف شد.' });
-        onDelete(id);
-    } else {
-        toast({ variant: 'destructive', title: 'خطا', description: 'حذف آیتم با مشکل مواجه شد.' });
-    }
+  const handleDelete = (id: string) => {
+    onDelete(id);
   };
 
   const handlePreviousPage = () => {
@@ -97,9 +99,27 @@ export function InventoryTable({
                   </TableCell>
                   <TableCell className="text-left">
                      <div className="flex items-center justify-end gap-2">
-                       <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
-                          <Trash2 className="h-4 w-4" />
-                       </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>آیا از حذف این آیتم اطمینان دارید؟</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              این عمل غیرقابل بازگشت است و اطلاعات این متریال برای همیشه حذف خواهد شد.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>لغو</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(item.id)} className={buttonVariants({ variant: "destructive" })}>
+                              حذف
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                      </div>
                   </TableCell>
                 </TableRow>
@@ -122,20 +142,40 @@ export function InventoryTable({
            <Pagination className="mx-0 w-auto">
              <PaginationContent>
                <PaginationItem>
-                 <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} />
+                 <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} disabled={currentPage === 1}/>
                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#" isActive>
-                    {currentPage}
-                  </PaginationLink>
-                </PaginationItem>
-                {currentPage < totalPages && (
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )}
+                {[...Array(totalPages)].map((_, i) => {
+                  const page = i + 1;
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          isActive={page === currentPage}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onPageChange(page);
+                          }}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                  if (
+                    (page === currentPage - 2 && currentPage > 3) ||
+                    (page === currentPage + 2 && currentPage < totalPages - 2)
+                  ) {
+                    return <PaginationEllipsis key={page} />;
+                  }
+                  return null;
+                })}
                <PaginationItem>
-                 <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }}/>
+                 <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} disabled={currentPage === totalPages}/>
                </PaginationItem>
              </PaginationContent>
            </Pagination>
@@ -144,3 +184,5 @@ export function InventoryTable({
     </Card>
   );
 }
+
+import { buttonVariants } from "@/components/ui/button"
