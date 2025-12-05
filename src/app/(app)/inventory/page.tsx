@@ -2,7 +2,7 @@
 import React, { useState, useTransition, useMemo, useRef, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Download, Search, Upload, Plus } from 'lucide-react';
+import { Download, Search, Upload, Plus, BrainCircuit, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { InventoryTable } from '@/app/(app)/inventory/InventoryTable';
 import type { Material } from '@/lib/types';
@@ -11,36 +11,48 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ExcelReader } from '@/app/(app)/inventory/ExcelReader';
 import { AddMaterialForm } from '@/app/(app)/inventory/AddMaterialForm';
 import { useMaterialStore } from '@/store/material-store';
+import { classifyMaterialsAction } from '@/app/actions/material-actions';
+import { Badge } from '@/components/ui/badge';
 
 const ITEMS_PER_PAGE = 10;
+
+type FilterType = 'all' | 'بالای دکل' | 'داخل رک' | 'پایین رک';
+
 
 export default function InventoryPage() {
   const { 
     materials, 
     addMaterials, 
     deleteMaterial, 
+    setMaterials,
     isHydrated 
   } = useMaterialStore();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [isSubmitting, startSubmittingTransition] = useTransition();
+  const [isClassifying, startClassifyingTransition] = useTransition();
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   
   const { toast } = useToast();
   const fileInputRef = useRef<{ click: () => void }>(null);
   
   const filteredMaterials = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return materials;
+    let results = materials;
+    if (activeFilter !== 'all') {
+      results = results.filter(m => m.location === activeFilter);
     }
-    const lowercasedTerm = searchTerm.toLowerCase();
-    return materials.filter(material =>
-      material.description.toLowerCase().includes(lowercasedTerm) ||
-      material.materialCode.toLowerCase().includes(lowercasedTerm) ||
-      (material.partNumber && material.partNumber.toLowerCase().includes(lowercasedTerm))
-    );
-  }, [materials, searchTerm]);
+    if (searchTerm.trim()) {
+      const lowercasedTerm = searchTerm.toLowerCase();
+      return results.filter(material =>
+        material.description.toLowerCase().includes(lowercasedTerm) ||
+        material.materialCode.toLowerCase().includes(lowercasedTerm) ||
+        (material.partNumber && material.partNumber.toLowerCase().includes(lowercasedTerm))
+      );
+    }
+    return results;
+  }, [materials, searchTerm, activeFilter]);
   
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -82,6 +94,40 @@ export default function InventoryPage() {
        }
      });
   }
+  
+  const handleClassify = () => {
+    const unclassifiedMaterials = materials.filter(m => !m.location);
+    if (unclassifiedMaterials.length === 0) {
+      toast({
+        title: 'همه آیتم‌ها دسته‌بندی شده‌اند',
+        description: 'نیازی به تحلیل مجدد نیست.',
+      });
+      return;
+    }
+
+    startClassifyingTransition(async () => {
+      try {
+        const classified = await classifyMaterialsAction(unclassifiedMaterials);
+        const updatedMaterials = materials.map(original => {
+          const found = classified.find(c => c.id === original.id);
+          return found ? { ...original, location: found.location } : original;
+        });
+        setMaterials(updatedMaterials);
+        toast({
+          title: 'تحلیل و دسته‌بندی موفق',
+          description: `${classified.length} آیتم با موفقیت دسته‌بندی شد.`,
+        });
+      } catch (error) {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'خطا در دسته‌بندی',
+          description: 'مشکلی در ارتباط با سرویس هوش مصنوعی پیش آمد.',
+        });
+      }
+    });
+  };
+
 
   const handleExport = (format: 'Excel' | 'PDF') => {
     toast({
@@ -106,10 +152,10 @@ export default function InventoryPage() {
     return filteredMaterials.slice(startIndex, endIndex);
   }, [filteredMaterials, currentPage]);
 
-  // Reset to page 1 when search term changes
+  // Reset to page 1 when search term or filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, activeFilter]);
   
   if (!isHydrated) {
      return (
@@ -136,10 +182,18 @@ export default function InventoryPage() {
       <PageHeader
         title="لیست متریال"
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+             <Button variant="outline" onClick={handleClassify} disabled={isClassifying}>
+              {isClassifying ? (
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              ) : (
+                <BrainCircuit className="ml-2 h-4 w-4" />
+              )}
+              تحلیل و دسته‌بندی
+            </Button>
             <Button variant="outline" onClick={() => setAddModalOpen(true)}>
                 <Plus className="ml-2 h-4 w-4" />
-                افزودن متریال جدید
+                افزودن متریال
             </Button>
             <Button onClick={() => handleExport('Excel')}>
               <Download className="ml-2 h-4 w-4" />
@@ -159,8 +213,8 @@ export default function InventoryPage() {
         }
       />
 
-      <div className="rounded-lg border bg-card p-4 shadow-sm">
-        <form onSubmit={(e) => e.preventDefault()} className="flex gap-4">
+      <div className="rounded-lg border bg-card p-4 shadow-sm space-y-4">
+        <div className="flex gap-4">
           <div className="relative flex-grow">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
@@ -171,7 +225,14 @@ export default function InventoryPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-        </form>
+        </div>
+         <div className="flex items-center gap-2">
+            <Badge className="text-sm py-1">فیلتر مکان:</Badge>
+            <Button variant={activeFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setActiveFilter('all')}>همه</Button>
+            <Button variant={activeFilter === 'بالای دکل' ? 'default' : 'outline'} size="sm" onClick={() => setActiveFilter('بالای دکل')}>بالای دکل</Button>
+            <Button variant={activeFilter === 'داخل رک' ? 'default' : 'outline'} size="sm" onClick={() => setActiveFilter('داخل رک')}>داخل رک</Button>
+            <Button variant={activeFilter === 'پایین رک' ? 'default' : 'outline'} size="sm" onClick={() => setActiveFilter('پایین رک')}>پایین رک</Button>
+        </div>
       </div>
 
       <InventoryTable

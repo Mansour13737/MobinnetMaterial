@@ -63,6 +63,19 @@ export function InventoryTable({
     onPageChange(Math.min(totalPages, currentPage + 1));
   };
 
+  const getLocationBadgeVariant = (location?: 'بالای دکل' | 'داخل رک' | 'پایین رک') => {
+    switch (location) {
+      case 'بالای دکل':
+        return 'secondary';
+      case 'داخل رک':
+        return 'outline';
+      case 'پایین رک':
+        return 'default';
+      default:
+        return 'destructive';
+    }
+  };
+
 
   return (
     <Card>
@@ -74,6 +87,7 @@ export function InventoryTable({
               <TableHead>Material</TableHead>
               <TableHead>Material description</TableHead>
               <TableHead>Part Number</TableHead>
+              <TableHead className="text-center">مکان</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
               <TableHead className="text-left">عملیات</TableHead>
             </TableRow>
@@ -86,6 +100,15 @@ export function InventoryTable({
                   <TableCell className="font-medium font-code">{item.materialCode}</TableCell>
                   <TableCell>{item.description}</TableCell>
                   <TableCell>{item.partNumber}</TableCell>
+                   <TableCell className="text-center">
+                    {item.location ? (
+                      <Badge variant={getLocationBadgeVariant(item.location)}>
+                        {item.location}
+                      </Badge>
+                    ) : (
+                       <Badge variant="outline">نامشخص</Badge>
+                    )}
+                  </TableCell>
                   <TableCell className="text-center">
                     <Badge
                       variant={
@@ -125,7 +148,7 @@ export function InventoryTable({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   {hasSearchResults ? 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد.' : 'هیچ آیتمی ثبت نشده است.'}
                 </TableCell>
               </TableRow>

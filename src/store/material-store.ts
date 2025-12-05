@@ -40,7 +40,7 @@ type MaterialState = {
   materials: Material[];
   isHydrated: boolean;
   setMaterials: (materials: Material[]) => void;
-  addMaterials: (newMaterials: Omit<Material, 'id' | 'status'>[]) => void;
+  addMaterials: (newMaterials: Omit<Material, 'id' | 'status' | 'location'>[]) => void;
   deleteMaterial: (id: string) => void;
   setHydrated: () => void;
 };
@@ -58,6 +58,7 @@ export const useMaterialStore = create<MaterialState>()(
             ...m,
             id: `material-${Date.now()}-${i}`,
             status: getStatusFromCode(m.materialCode),
+            location: undefined,
           }));
           return { materials: [...materialsToAdd, ...state.materials] };
         }),
@@ -73,7 +74,7 @@ export const useMaterialStore = create<MaterialState>()(
         if (state) {
             // Set initial data only if storage is empty
             if (state.materials.length === 0) {
-                state.materials = initialMaterials;
+                state.materials = initialMaterials.map(m => ({ ...m, location: undefined }));
             }
             state.setHydrated();
         }
