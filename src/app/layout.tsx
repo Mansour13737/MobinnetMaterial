@@ -3,6 +3,9 @@ import { Source_Code_Pro, Vazirmatn } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import React from 'react';
+import { AppHeader } from '@/components/layout/AppHeader';
+
 
 const fontBody = Vazirmatn({
   subsets: ['arabic', 'latin'],
@@ -58,7 +61,12 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <body className={cn('font-body antialiased', fontBody.variable, fontCode.variable)}>
-        {children}
+        <div className="flex h-screen w-full flex-col">
+          <AppHeader />
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+            {children}
+          </main>
+        </div>
         <Toaster />
       </body>
     </html>
