@@ -78,7 +78,7 @@ export function AddMaterialForm({
               name="materialCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Material</FormLabel>
+                  <FormLabel>کد متریال</FormLabel>
                   <FormControl>
                     <Input placeholder="مثلا 10001234" {...field} />
                   </FormControl>
@@ -91,7 +91,7 @@ export function AddMaterialForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Material description</FormLabel>
+                  <FormLabel>شرح متریال</FormLabel>
                   <FormControl>
                     <Input placeholder="مثلا TOWER SECTION 20M" {...field} />
                   </FormControl>

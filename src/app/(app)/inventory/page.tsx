@@ -13,6 +13,7 @@ import { AddMaterialForm } from '@/app/(app)/inventory/AddMaterialForm';
 import { useMaterialStore } from '@/store/material-store';
 import { classifyMaterialsAction } from '@/app/actions/material-actions';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -37,6 +38,8 @@ export default function InventoryPage() {
   
   const { toast } = useToast();
   const fileInputRef = useRef<{ click: () => void }>(null);
+  
+  const unclassifiedCount = useMemo(() => materials.filter(m => !m.location).length, [materials]);
   
   const filteredMaterials = useMemo(() => {
     let results = materials;
@@ -183,14 +186,29 @@ export default function InventoryPage() {
         title="لیست متریال"
         actions={
           <div className="flex flex-wrap items-center gap-2">
-             <Button variant="outline" onClick={handleClassify} disabled={isClassifying}>
-              {isClassifying ? (
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-              ) : (
-                <BrainCircuit className="ml-2 h-4 w-4" />
-              )}
-              تحلیل و دسته‌بندی
-            </Button>
+             <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {/* The button is wrapped in a span to allow the tooltip to show even when disabled */}
+                        <span tabIndex={0}>
+                            <Button variant="outline" onClick={handleClassify} disabled={isClassifying || unclassifiedCount === 0}>
+                              {isClassifying ? (
+                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <BrainCircuit className="ml-2 h-4 w-4" />
+                              )}
+                              تحلیل و دسته‌بندی
+                            </Button>
+                        </span>
+                    </TooltipTrigger>
+                    {unclassifiedCount === 0 && (
+                       <TooltipContent>
+                         <p>همه آیتم‌ها دسته‌بندی شده‌اند</p>
+                       </TooltipContent>
+                    )}
+                </Tooltip>
+             </TooltipProvider>
+
             <Button variant="outline" onClick={() => setAddModalOpen(true)}>
                 <Plus className="ml-2 h-4 w-4" />
                 افزودن متریال
