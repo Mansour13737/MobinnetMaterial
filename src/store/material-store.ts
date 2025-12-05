@@ -19,7 +19,6 @@ const initialMaterials: Material[] = [
       description: 'FO D/C SM SC/SC 1CORE 2GUIDE OD 100M',
       status: getStatusFromCode('100037151'),
       partNumber: 'PN-001',
-      location: 'داخل رک'
     },
     {
       id: '2',
@@ -27,7 +26,6 @@ const initialMaterials: Material[] = [
       description: 'TOWER SECTION 20M',
       status: getStatusFromCode('M100037152'),
       partNumber: 'PN-002',
-      location: 'بالای دکل'
     },
     {
       id: '3',
@@ -35,7 +33,6 @@ const initialMaterials: Material[] = [
       description: 'TURNBUCKLE 16MM - DEFECTIVE',
       status: getStatusFromCode('N100037153'),
       partNumber: 'PN-003',
-      location: 'بالای دکل'
     },
 ];
 
@@ -43,7 +40,7 @@ type MaterialState = {
   materials: Material[];
   isHydrated: boolean;
   setMaterials: (materials: Material[]) => void;
-  addMaterials: (newMaterials: Omit<Material, 'id' | 'status' | 'location'>[]) => void;
+  addMaterials: (newMaterials: Omit<Material, 'id' | 'status'>[]) => void;
   deleteMaterial: (id: string) => void;
   setHydrated: () => void;
 };
@@ -61,7 +58,6 @@ export const useMaterialStore = create<MaterialState>()(
             ...m,
             id: `material-${Date.now()}-${i}`,
             status: getStatusFromCode(m.materialCode),
-            location: undefined,
           }));
           return { materials: [...materialsToAdd, ...state.materials] };
         }),

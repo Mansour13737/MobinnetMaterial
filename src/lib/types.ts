@@ -4,5 +4,4 @@ export type Material = {
   description: string;
   partNumber?: string;
   status: 'سالم' | 'معیوب';
-  location?: 'بالای دکل' | 'داخل رک' | 'پایین رک';
 };
