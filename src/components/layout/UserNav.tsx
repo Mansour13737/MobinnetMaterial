@@ -19,7 +19,7 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
-                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="کاربر" />
+                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="مبین نت" />
                 <AvatarFallback>
                     <User />
                 </AvatarFallback>
@@ -29,9 +29,9 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">کاربر سیستم</p>
+            <p className="text-sm font-medium leading-none">مبین نت</p>
             <p className="text-xs leading-none text-muted-foreground">
-              user@example.com
+              info@mobinnet.ir
             </p>
           </div>
         </DropdownMenuLabel>
