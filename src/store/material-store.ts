@@ -19,6 +19,7 @@ const initialMaterials: Material[] = [
       description: 'FO D/C SM SC/SC 1CORE 2GUIDE OD 100M',
       status: getStatusFromCode('100037151'),
       partNumber: 'PN-001',
+      location: 'داخل رک'
     },
     {
       id: '2',
@@ -26,6 +27,7 @@ const initialMaterials: Material[] = [
       description: 'TOWER SECTION 20M',
       status: getStatusFromCode('M100037152'),
       partNumber: 'PN-002',
+      location: 'بالای دکل'
     },
     {
       id: '3',
@@ -33,6 +35,7 @@ const initialMaterials: Material[] = [
       description: 'TURNBUCKLE 16MM - DEFECTIVE',
       status: getStatusFromCode('N100037153'),
       partNumber: 'PN-003',
+      location: 'بالای دکل'
     },
 ];
 
@@ -74,7 +77,7 @@ export const useMaterialStore = create<MaterialState>()(
         if (state) {
             // Set initial data only if storage is empty
             if (state.materials.length === 0) {
-                state.materials = initialMaterials.map(m => ({ ...m, location: undefined }));
+                state.materials = initialMaterials;
             }
             state.setHydrated();
         }
