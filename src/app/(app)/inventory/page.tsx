@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ExcelReader } from '@/app/(app)/inventory/ExcelReader';
 import { AddMaterialForm } from '@/app/(app)/inventory/AddMaterialForm';
 import { useMaterialStore } from '@/store/material-store';
-import { searchMaterialsAction } from '@/app/actions/material-actions';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -24,48 +23,24 @@ export default function InventoryPage() {
   } = useMaterialStore();
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearching, startSearchTransition] = useTransition();
   const [isSubmitting, startSubmittingTransition] = useTransition();
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchResults, setSearchResults] = useState<Material[] | null>(null);
   
   const { toast } = useToast();
   const fileInputRef = useRef<{ click: () => void }>(null);
   
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const filteredMaterials = useMemo(() => {
     if (!searchTerm.trim()) {
-      setSearchResults(null);
-      return;
+      return materials;
     }
-    
-    startSearchTransition(async () => {
-      try {
-        const results = await searchMaterialsAction({
-          searchQuery: searchTerm,
-          materials,
-        });
-        setSearchResults(results);
-        toast({
-          title: 'جستجو کامل شد',
-          description: `${results.length} نتیجه مرتبط یافت شد.`,
-        });
-      } catch (error) {
-        console.error(error);
-        toast({
-          variant: 'destructive',
-          title: 'خطا در جستجو',
-          description: 'جستجوی هوشمند با مشکل مواجه شد. لطفا دوباره تلاش کنید.',
-        });
-      }
-    });
-  };
-
-  const currentMaterials = useMemo(() => {
-    return searchResults !== null ? searchResults : materials;
-  }, [materials, searchResults]);
-
+    const lowercasedTerm = searchTerm.toLowerCase();
+    return materials.filter(material =>
+      material.description.toLowerCase().includes(lowercasedTerm) ||
+      material.materialCode.toLowerCase().includes(lowercasedTerm) ||
+      (material.partNumber && material.partNumber.toLowerCase().includes(lowercasedTerm))
+    );
+  }, [materials, searchTerm]);
   
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -123,26 +98,19 @@ export default function InventoryPage() {
     });
   }
   
-  const totalPages = Math.ceil(currentMaterials.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredMaterials.length / ITEMS_PER_PAGE);
 
   const paginatedMaterials = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return currentMaterials.slice(startIndex, endIndex);
-  }, [currentMaterials, currentPage]);
+    return filteredMaterials.slice(startIndex, endIndex);
+  }, [filteredMaterials, currentPage]);
 
-  // Reset to page 1 when search term changes or results are cleared
+  // Reset to page 1 when search term changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, searchResults]);
-  
-  // Clear search results when search term is empty
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setSearchResults(null);
-    }
   }, [searchTerm]);
-
+  
   if (!isHydrated) {
      return (
       <div className="p-4 md:p-6 lg:p-8 space-y-6">
@@ -192,26 +160,23 @@ export default function InventoryPage() {
       />
 
       <div className="rounded-lg border bg-card p-4 shadow-sm">
-        <form onSubmit={handleSearch} className="flex gap-4">
+        <form onSubmit={(e) => e.preventDefault()} className="flex gap-4">
           <div className="relative flex-grow">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="جستجوی هوشمند متریال (مثلا: چوپوقی دکل)..."
+              placeholder="جستجو در کد، شرح یا پارت نامبر..."
               className="w-full rounded-lg bg-background pr-10 h-12 text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button type="submit" size="lg" disabled={isSearching}>
-            {isSearching ? 'در حال جستجو...' : 'پیدا کن'}
-          </Button>
         </form>
       </div>
 
       <InventoryTable
         materials={paginatedMaterials}
-        hasSearchResults={searchResults !== null}
+        hasSearchResults={searchTerm.trim().length > 0 && filteredMaterials.length === 0}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}

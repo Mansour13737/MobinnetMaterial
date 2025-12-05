@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import type { Material } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +50,6 @@ export function InventoryTable({
   onPageChange: (page: number) => void,
   onDelete: (id: string) => void
 }) {
-  const { toast } = useToast();
 
   const handleDelete = (id: string) => {
     onDelete(id);
