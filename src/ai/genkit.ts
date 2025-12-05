@@ -1,12 +1,10 @@
+'use server';
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import { config } from 'dotenv';
-
-// Load environment variables from .env file before anything else.
-config();
 
 // Initialize Genkit and the Google AI plugin.
-// The API key is now reliably read from process.env after dotenv.config() is called.
+// The googleAI() plugin will automatically look for the GEMINI_API_KEY 
+// in the process.env, which is made available by Next.js configuration.
 export const ai = genkit({
   plugins: [
     googleAI(),
