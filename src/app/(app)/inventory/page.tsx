@@ -19,8 +19,7 @@ export default function InventoryPage() {
     materials, 
     addMaterials, 
     deleteMaterial, 
-    isHydrated,
-    addSearchTerm
+    isHydrated
   } = useMaterialStore();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,9 +31,8 @@ export default function InventoryPage() {
   const fileInputRef = useRef<{ click: () => void }>(null);
   
   const handleSearchSubmit = (term: string) => {
-    if (term.trim()) {
-      addSearchTerm(term.trim());
-    }
+    // This function is now a placeholder if we need to add back search-related logic,
+    // like adding to a search history. For now, it does nothing as filtering is live.
   };
   
   const filteredMaterials = useMemo(() => {

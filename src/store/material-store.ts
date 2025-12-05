@@ -2,6 +2,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Material } from '@/lib/types';
+import React, { useEffect } from 'react';
+
 
 // Function to determine status based on material code
 const getStatusFromCode = (code: string): 'سالم' | 'معیوب' => {
@@ -38,13 +40,10 @@ const initialMaterials: Material[] = [
 
 type MaterialState = {
   materials: Material[];
-  searchHistory: string[];
   isHydrated: boolean;
   setMaterials: (materials: Material[]) => void;
   addMaterials: (newMaterials: Omit<Material, 'id' | 'status'>[]) => void;
   deleteMaterial: (id: string) => void;
-  addSearchTerm: (term: string) => void;
-  clearSearchHistory: () => void;
   setHydrated: () => void;
 };
 
@@ -52,7 +51,6 @@ export const useMaterialStore = create<MaterialState>()(
   persist(
     (set) => ({
       materials: [],
-      searchHistory: [],
       isHydrated: false,
       setHydrated: () => set({ isHydrated: true }),
       setMaterials: (materials) => set({ materials }),
@@ -69,12 +67,6 @@ export const useMaterialStore = create<MaterialState>()(
         set((state) => ({
           materials: state.materials.filter((m) => m.id !== id),
         })),
-      addSearchTerm: (term) =>
-        set((state) => {
-          const newHistory = [term, ...state.searchHistory.filter(t => t !== term)].slice(0, 10);
-          return { searchHistory: newHistory };
-        }),
-      clearSearchHistory: () => set({ searchHistory: [] }),
     }),
     {
       name: 'material-storage', 
@@ -101,24 +93,6 @@ const useBoundStore = (selector: (state: MaterialState) => any) => {
         setIsHydrated(true);
     }, []);
     return isHydrated ? store : selector(useMaterialStore.getState());
-};
-
-
-// Custom hook to listen for search term events
-export const useSearchTermHandler = (
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>
-) => {
-  useEffect(() => {
-    const handleSetSearchTerm = (event: Event) => {
-      const customEvent = event as CustomEvent<string>;
-      setSearchTerm(customEvent.detail);
-    };
-
-    window.addEventListener('set-search-term', handleSetSearchTerm);
-    return () => {
-      window.removeEventListener('set-search-term', handleSetSearchTerm);
-    };
-  }, [setSearchTerm]);
 };
 
 

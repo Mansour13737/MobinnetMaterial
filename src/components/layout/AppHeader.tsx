@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
-import { SearchHistory } from '@/components/layout/SearchHistory';
 
 export function AppHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,9 +17,6 @@ export function AppHeader() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="hidden md:block">
-            <SearchHistory />
-        </div>
         <div className="md:hidden">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
@@ -34,9 +30,6 @@ export function AppHeader() {
                 <Link href="/inventory" className="mb-4 flex items-center gap-2 text-lg font-bold" onClick={() => setIsMobileMenuOpen(false)}>
                    Mobin-Net Materials
                 </Link>
-                <div className="border-t border-white/20 pt-4">
-                     <SearchHistory />
-                </div>
               </div>
             </SheetContent>
           </Sheet>
