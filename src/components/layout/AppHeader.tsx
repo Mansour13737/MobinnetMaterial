@@ -95,23 +95,6 @@ export function AppHeader() {
         <Link href="/inventory" className="flex items-center gap-2">
            <MobinnetLogo />
         </Link>
-        <nav className="hidden items-center gap-4 md:flex">
-          {menuItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                pathname.startsWith(item.href)
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-300 hover:bg-white/20 hover:text-white'
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
       </div>
 
       <div className="flex items-center gap-4">
