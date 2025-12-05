@@ -14,9 +14,9 @@ const fontCode = Source_Code_Pro({
   variable: '--font-code',
 });
 
-const APP_NAME = "TowerTrack";
-const APP_DEFAULT_TITLE = "TowerTrack";
-const APP_TITLE_TEMPLATE = "%s - TowerTrack";
+const APP_NAME = "MobinnetMaterial";
+const APP_DEFAULT_TITLE = "MobinnetMaterial";
+const APP_TITLE_TEMPLATE = "%s - MobinnetMaterial";
 const APP_DESCRIPTION = "پلتفرم هوشمند مدیریت موجودی متریال دکل‌ها";
 
 export const metadata: Metadata = {
@@ -34,6 +34,15 @@ export const metadata: Metadata = {
   },
   formatDetection: {
     telephone: false,
+  },
+  icons: {
+    icon: "/icons/favicon-32x32.png",
+    apple: [
+      { url: '/icons/apple-touch-icon.png' },
+      { url: '/icons/apple-touch-icon-76x76.png', sizes: '76x76' },
+      { url: '/icons/apple-touch-icon-120x120.png', sizes: '120x120' },
+      { url: '/icons/apple-touch-icon-152x152.png', sizes: '152x152' },
+    ],
   },
 };
 
