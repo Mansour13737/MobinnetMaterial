@@ -19,7 +19,8 @@ export default function InventoryPage() {
     materials, 
     addMaterials, 
     deleteMaterial, 
-    isHydrated 
+    isHydrated,
+    addSearchTerm
   } = useMaterialStore();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +30,12 @@ export default function InventoryPage() {
   
   const { toast } = useToast();
   const fileInputRef = useRef<{ click: () => void }>(null);
+  
+  const handleSearchSubmit = (term: string) => {
+    if (term.trim()) {
+      addSearchTerm(term.trim());
+    }
+  };
   
   const filteredMaterials = useMemo(() => {
     let results = materials;
@@ -161,7 +168,7 @@ export default function InventoryPage() {
       />
 
       <div className="rounded-lg border bg-card p-4 shadow-sm space-y-4">
-        <div className="flex gap-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(searchTerm); }}>
           <div className="relative flex-grow">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
@@ -172,7 +179,7 @@ export default function InventoryPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-        </div>
+        </form>
       </div>
 
       <InventoryTable
