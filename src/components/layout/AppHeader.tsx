@@ -1,11 +1,9 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { List, Menu, TowerControl } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Menu } from 'lucide-react';
 import { UserNav } from './UserNav';
 
 const MobinnetLogo = () => (
@@ -76,17 +74,7 @@ const MobinnetLogo = () => (
   </svg>
 );
 
-
-const menuItems = [
-  {
-    href: '/inventory',
-    label: 'لیست متریال',
-    icon: List,
-  },
-];
-
 export function AppHeader() {
-  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -111,24 +99,7 @@ export function AppHeader() {
                 <Link href="/inventory" className="mb-4 flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                    <MobinnetLogo />
                 </Link>
-                <nav className="flex flex-col gap-2">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={cn(
-                        'flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium',
-                        pathname.startsWith(item.href)
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                      )}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.label}</span>
-                    </Link>
-                  ))}
-                </nav>
+                {/* Mobile navigation can be added here if needed in the future */}
               </div>
             </SheetContent>
           </Sheet>
